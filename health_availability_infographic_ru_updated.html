@@ -366,7 +366,7 @@
 
     <div class="notes">
       <p>Если объект не работает — значит, учреждение в целом закрыто и помощь там не оказывается. Если что-то недоступно — учреждение работает, но внутри не хватает какого-то конкретного ресурса или услуги: воды, СИЗ, санузлов, родильных коек и т. д.</p>
-      </p>Барьер «нехватка персонала» может относиться в целом к способности медобъекта обеспечить ресурс в рабочем режиме. Для стационарных коек это может означать нехватку врачей, медсестер или акушерок. Для средств индивидуальной защиты — отсутствие сотрудников, которые отвечают за закупку, учет, распределение и контроль использования. Для электроснабжения и холодовой цепи — нехватку специалистов, которые обслуживают генераторы, холодильное оборудование и температурный режим. «Нет обучения» значит, что у сотрудников нет нужной подготовки или инструктажа, чтобы правильно использовать этот ресурс или поддерживать его работу.</p>
+      </p>Барьер «нехватка персонала» может относиться в целом к способности медобъекта обеспечить ресурс в рабочем режиме. Для стационарных коек это может означать нехватку врачей, медсестер или акушерок. Для средств индивидуальной защиты — отсутствие сотрудников, которые отвечают за закупку, учет, распределение и контроль использования. Для электроснабжения и холодовой цепи — нехватку специалистов, которые обслуживают генераторы, холодильное оборудование и температурный режим.</p>
     </div>
 
     <div class="source">
@@ -385,6 +385,8 @@
           {
             key: "icu",
             label: "Койки ICU",
+            buttonLabel: "Койки ICU",
+            title: "Лишь 1% коек ICU доступны полностью",
             description: "ICU — отделение интенсивной терапии",
             availability: { available: 1, partial: 1, notAvailable: 7, extra: 50, notOperational: 41 },
             barriers: { staff: 7, training: 12, supplies: 51, equipment: 41, financial: 40, water: 0 }
@@ -392,12 +394,16 @@
           {
             key: "maternity",
             label: "Родильные койки",
+            buttonLabel: "Родильные койки",
+            title: "Только 8% родильных коек доступны полностью",
             availability: { available: 8, partial: 8, notAvailable: 5, extra: 37, notOperational: 41 },
             barriers: { staff: 7, training: 12, supplies: 51, equipment: 41, financial: 40, water: 0 }
           },
           {
             key: "general",
             label: "Обычные стационарные койки",
+            buttonLabel: "Обычные стационарные койки",
+            title: "Четыре из пяти стационарных коек недоступны",
             availability: { available: 19, partial: 10, notAvailable: 4, extra: 26, notOperational: 41 },
             barriers: { staff: 7, training: 12, supplies: 51, equipment: 41, financial: 40, water: 0 }
           }
@@ -410,24 +416,32 @@
           {
             key: "water",
             label: "Вода",
+            buttonLabel: "Вода",
+            title: "Только в трети объектов есть полный доступ к воде",
             availability: { available: 34, partial: 20, notAvailable: 5, extra: 0, notOperational: 41 },
             barriers: { staff: 1, training: 17, supplies: 69, equipment: 41, financial: 54, water: 0 }
           },
           {
             key: "sanitation",
             label: "Санитарные помещения",
+            buttonLabel: "Санитарные помещения",
+            title: "Только в каждом четвертом объекте есть нормальный санузел",
             availability: { available: 26, partial: 19, notAvailable: 13, extra: 0, notOperational: 41 },
             barriers: { staff: 2, training: 9, supplies: 39, equipment: 56, financial: 62, water: 24 }
           },
           {
             key: "handhygiene",
             label: "Средства гигиены рук",
+            buttonLabel: "Средства гигиены рук",
+            title: "Средства гигиены полностью недоступны в четверти объектов",
             availability: { available: 16, partial: 17, notAvailable: 26, extra: 0, notOperational: 41 },
             barriers: { staff: 4, training: 11, supplies: 63, equipment: 71, financial: 49, water: 23 }
           },
           {
             key: "ppe",
             label: "Средства индивидуальной защиты",
+            buttonLabel: "Средства индивидуальной защиты",
+            title: "Средства индивидуальной защиты полностью доступны только в 16% объектов",
             availability: { available: 16, partial: 27, notAvailable: 16, extra: 0, notOperational: 41 },
             barriers: { staff: 5, training: 14, supplies: 75, equipment: 46, financial: 52, water: 13 }
           }
@@ -440,12 +454,16 @@
           {
             key: "power",
             label: "Электроснабжение",
+            buttonLabel: "Электроснабжение",
+            title: "Электроснабжение полностью доступно менее чем в трети объектов",
             availability: { available: 28, partial: 8, notAvailable: 23, extra: 0, notOperational: 41 },
             barriers: { staff: 1, training: 8, supplies: 55, equipment: 47, financial: 72, water: 0 }
           },
           {
             key: "cold",
             label: "Холодовая цепь",
+            buttonLabel: "Холодовая цепь",
+            title: "Холодовая цепь полностью доступна только в пятой части объектов",
             description: "Холодовая цепь — оборудование и условия для хранения препаратов и вакцин при нужной температуре",
             availability: { available: 20, partial: 6, notAvailable: 22, extra: 10, notOperational: 41 },
             barriers: { staff: 5, training: 9, supplies: 57, equipment: 61, financial: 67, water: 0 }
@@ -459,6 +477,8 @@
           {
             key: "comm-eq",
             label: "Средства связи",
+            buttonLabel: "Средства связи",
+            title: "Средства связи полностью доступны только в пятой части объектов",
             description: "Средства связи — телефоны, радиостанции и т.п., необходимые для координации действий внутри объекта и связи с внешними службами",
             availability: { available: 22, partial: 15, notAvailable: 22, extra: 0, notOperational: 41 },
             barriers: { staff: 2, training: 9, supplies: 40, equipment: 46, financial: 73, water: 0 }
@@ -535,7 +555,7 @@
         const btn = document.createElement('button');
         btn.className = `chip${indicator.key === activeIndicatorKey ? ' is-active' : ''}`;
         btn.type = 'button';
-        btn.textContent = indicator.label;
+        btn.textContent = indicator.buttonLabel;
         btn.addEventListener('click', () => {
           activeIndicatorKey = indicator.key;
           renderAll();
@@ -813,7 +833,7 @@
       renderSectionTabs();
       renderIndicatorChips();
 
-      availabilityTitleEl.textContent = indicator.label;
+      availabilityTitleEl.textContent = indicator.title;
       setPanelSubtitle(availabilitySubtitleEl, indicator.description || '');
       setPanelSubtitle(barrierSubtitleEl, '');
       renderSummaryCards(indicator);
