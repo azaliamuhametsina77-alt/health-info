@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Доступность ресурсов в медобъектах Судана</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #fbfbfb;
+      --panel: #ffffff;
+      --text: #111111;
+      --muted: #646464;
+      --grid: #dddddd;
+      --line: #e9e9e9;
+
+      --available: #5b88d6;
+      --partial: #d9e2f1;
+      --not-available: #f0c46a;
+      --extra: #e7d9d9;
+      --not-operational: #d99696;
+
+      --staff: #5b88d6;
+      --training: #5b88d6;
+      --supplies: #5b88d6;
+      --equipment: #5b88d6;
+      --financial: #5b88d6;
+      --water: #5b88d6;
+
+      --accent: #6b5fc9;
+      --shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Montserrat", sans-serif;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 18px 26px;
+      background: var(--bg);
+    }
+
+    .title {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      max-width: 920px;
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .tab {
+      appearance: none;
+      border: 1px solid #d8d8d8;
+      background: #ffffff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+
+    .tab:hover {
+      border-color: #c9c9c9;
+      transform: translateY(-1px);
+    }
+
+    .tab.is-active {
+      background: var(--text);
+      color: #ffffff;
+      border-color: var(--text);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      appearance: none;
+      border: 1px solid #dcdcdc;
+      background: #ffffff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+
+    .chip:hover {
+      border-color: #bebebe;
+      background: #ffffff;
+    }
+
+    .chip.is-active {
+      background: #111111;
+      color: #ffffff;
+      border-color: #111111;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 16px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-subtitle {
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .summary-card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 12px 11px;
+      min-height: 74px;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex: 0 0 10px;
+      display: inline-block;
+    }
+
+    .summary-value {
+      margin-top: 8px;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .chart-box {
+      position: relative;
+      width: 100%;
+      background: var(--bg);
+      border-radius: 16px;
+      margin-top: 16px;
+    }
+
+    .chart-box.availability {
+      height: 136px;
+      padding: 0;
+      background: #fbfbfb;
+    }
+
+    .chart-box.barriers {
+      min-height: 360px;
+      padding: 0;
+      background: #ffffff;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 18px;
+      margin-top: 16px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1.2;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .notes {
+      margin-top: 16px;
+      font-size: 13px;
+      line-height: 1.58;
+      color: var(--muted);
+    }
+
+    .notes p {
+      margin: 8px 0 0;
+    }
+
+    .source {
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .source a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .source a:hover { text-decoration: underline; }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .chart-box.barriers {
+        min-height: 320px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 16px 14px 22px;
+      }
+
+      .title {
+        font-size: 24px;
+      }
+
+      .subtitle {
+        font-size: 14px;
+      }
+
+      .panel {
+        padding: 16px 14px 14px;
+      }
+
+      .panel-title {
+        font-size: 18px;
+      }
+
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .summary-card {
+        min-height: 68px;
+        padding: 10px 10px 9px;
+      }
+
+      .summary-value {
+        font-size: 21px;
+      }
+
+      .chart-box.barriers {
+        min-height: 290px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">Что есть в медобъектах Судана — и чего им не хватает</h1>
+    <div class="subtitle">
+      Выберите тематический блок и конкретный показатель:
+      слева показана его доступность, справа — барьеры для частичной или полной доступности
+    </div>
+
+    <div id="sectionTabs" class="tabs" aria-label="Разделы"></div>
+    <div id="indicatorChips" class="chips" aria-label="Показатели"></div>
+
+    <div class="grid">
+      <section class="panel">
+        <h2 id="availabilityTitle" class="panel-title"></h2>
+        <div id="availabilitySubtitle" class="panel-subtitle"></div>
+
+        <div id="summary" class="summary"></div>
+
+        <div class="chart-box availability">
+          <canvas id="availabilityChart"></canvas>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Что мешает доступности</h2>
+        <div id="barrierSubtitle" class="panel-subtitle"></div>
+
+        <div class="chart-box barriers">
+          <canvas id="barrierChart"></canvas>
+        </div>
+
+      </section>
+    </div>
+
+    <div class="notes">
+      <p>Если объект не работает — значит, учреждение в целом закрыто и помощь там не оказывается. Если что-то недоступно — учреждение работает, но внутри не хватает какого-то конкретного ресурса или услуги: воды, СИЗ, санузлов, родильных коек и т. д.</p>
+      </p>Барьер «нехватка персонала» может относиться в целом к способности медобъекта обеспечить ресурс в рабочем режиме. Для стационарных коек это может означать нехватку врачей, медсестер или акушерок. Для средств индивидуальной защиты — отсутствие сотрудников, которые отвечают за закупку, учет, распределение и контроль использования. Для электроснабжения и холодовой цепи — нехватку специалистов, которые обслуживают генераторы, холодильное оборудование и температурный режим. «Нет обучения» значит, что у сотрудников нет нужной подготовки или инструктажа, чтобы правильно использовать этот ресурс или поддерживать его работу.</p>
+    </div>
+
+    <div class="source">
+      Диаграмма: Азалия Мухаметшина, 2026 · Источник: <a href="https://cdn.who.int/media/docs/default-source/documents/emergencies/herams/herams-sudan-baseline-report-2025-operational-status-of-the-health-system.pdf?sfvrsn=1f025930_5&download=true" target="_blank" rel="noopener noreferrer">
+  WHO HeRAMS Sudan, система ВОЗ для мониторинга наличия медицинских ресурсов и услуг
+</a>
+    </div>
+  </div>
+
+  <script>
+    const sections = [
+      {
+        key: "beds",
+        label: "Стационарные койки",
+        indicators: [
+          {
+            key: "icu",
+            label: "Койки ICU",
+            description: "ICU — отделение интенсивной терапии",
+            availability: { available: 1, partial: 1, notAvailable: 7, extra: 50, notOperational: 41 },
+            barriers: { staff: 7, training: 12, supplies: 51, equipment: 41, financial: 40, water: 0 }
+          },
+          {
+            key: "maternity",
+            label: "Родильные койки",
+            availability: { available: 8, partial: 8, notAvailable: 5, extra: 37, notOperational: 41 },
+            barriers: { staff: 7, training: 12, supplies: 51, equipment: 41, financial: 40, water: 0 }
+          },
+          {
+            key: "general",
+            label: "Обычные стационарные койки",
+            availability: { available: 19, partial: 10, notAvailable: 4, extra: 26, notOperational: 41 },
+            barriers: { staff: 7, training: 12, supplies: 51, equipment: 41, financial: 40, water: 0 }
+          }
+        ]
+      },
+      {
+        key: "wash",
+        label: "Вода, санитария и гигиена",
+        indicators: [
+          {
+            key: "water",
+            label: "Вода",
+            availability: { available: 34, partial: 20, notAvailable: 5, extra: 0, notOperational: 41 },
+            barriers: { staff: 1, training: 17, supplies: 69, equipment: 41, financial: 54, water: 0 }
+          },
+          {
+            key: "sanitation",
+            label: "Санитарные помещения",
+            availability: { available: 26, partial: 19, notAvailable: 13, extra: 0, notOperational: 41 },
+            barriers: { staff: 2, training: 9, supplies: 39, equipment: 56, financial: 62, water: 24 }
+          },
+          {
+            key: "handhygiene",
+            label: "Средства гигиены рук",
+            availability: { available: 16, partial: 17, notAvailable: 26, extra: 0, notOperational: 41 },
+            barriers: { staff: 4, training: 11, supplies: 63, equipment: 71, financial: 49, water: 23 }
+          },
+          {
+            key: "ppe",
+            label: "Средства индивидуальной защиты",
+            availability: { available: 16, partial: 27, notAvailable: 16, extra: 0, notOperational: 41 },
+            barriers: { staff: 5, training: 14, supplies: 75, equipment: 46, financial: 52, water: 13 }
+          }
+        ]
+      },
+      {
+        key: "power",
+        label: "Электроснабжение и хранение",
+        indicators: [
+          {
+            key: "power",
+            label: "Электроснабжение",
+            availability: { available: 28, partial: 8, notAvailable: 23, extra: 0, notOperational: 41 },
+            barriers: { staff: 1, training: 8, supplies: 55, equipment: 47, financial: 72, water: 0 }
+          },
+          {
+            key: "cold",
+            label: "Холодовая цепь",
+            description: "Холодовая цепь — оборудование и условия для хранения препаратов и вакцин при нужной температуре",
+            availability: { available: 20, partial: 6, notAvailable: 22, extra: 10, notOperational: 41 },
+            barriers: { staff: 5, training: 9, supplies: 57, equipment: 61, financial: 67, water: 0 }
+          }
+        ]
+      },
+      {
+        key: "comm",
+        label: "Средства связи",
+        indicators: [
+          {
+            key: "comm-eq",
+            label: "Средства связи",
+            description: "Средства связи — телефоны, радиостанции и т.п., необходимые для координации действий внутри объекта и связи с внешними службами",
+            availability: { available: 22, partial: 15, notAvailable: 22, extra: 0, notOperational: 41 },
+            barriers: { staff: 2, training: 9, supplies: 40, equipment: 46, financial: 73, water: 0 }
+          }
+        ]
+      }
+    ];
+
+    const formatPct = (value) => `${value}%`;
+
+    const colors = {
+      available: getComputedStyle(document.documentElement).getPropertyValue('--available').trim(),
+      partial: getComputedStyle(document.documentElement).getPropertyValue('--partial').trim(),
+      notAvailable: getComputedStyle(document.documentElement).getPropertyValue('--not-available').trim(),
+      extra: getComputedStyle(document.documentElement).getPropertyValue('--extra').trim(),
+      notOperational: getComputedStyle(document.documentElement).getPropertyValue('--not-operational').trim(),
+      staff: getComputedStyle(document.documentElement).getPropertyValue('--staff').trim(),
+      training: getComputedStyle(document.documentElement).getPropertyValue('--training').trim(),
+      supplies: getComputedStyle(document.documentElement).getPropertyValue('--supplies').trim(),
+      equipment: getComputedStyle(document.documentElement).getPropertyValue('--equipment').trim(),
+      financial: getComputedStyle(document.documentElement).getPropertyValue('--financial').trim(),
+      water: getComputedStyle(document.documentElement).getPropertyValue('--water').trim(),
+    };
+
+    const barrierMeta = [
+      { key: 'staff', label: 'Нет персонала', color: colors.staff },
+      { key: 'training', label: 'Нет обучения', color: colors.training },
+      { key: 'supplies', label: 'Нет поставок', color: colors.supplies },
+      { key: 'equipment', label: 'Нет оборудования', color: colors.equipment },
+      { key: 'financial', label: 'Нет финансов', color: colors.financial },
+      { key: 'water', label: 'Нет воды', color: colors.water }
+    ];
+
+    let activeSectionKey = sections[0].key;
+    let activeIndicatorKey = sections[0].indicators[0].key;
+
+    const sectionTabsEl = document.getElementById('sectionTabs');
+    const indicatorChipsEl = document.getElementById('indicatorChips');
+    const availabilityTitleEl = document.getElementById('availabilityTitle');
+    const availabilitySubtitleEl = document.getElementById('availabilitySubtitle');
+    const barrierSubtitleEl = document.getElementById('barrierSubtitle');
+    const summaryEl = document.getElementById('summary');
+    const extraLegendItemEl = document.getElementById('extraLegendItem');
+
+    function getActiveSection() {
+      return sections.find(section => section.key === activeSectionKey);
+    }
+
+    function getActiveIndicator() {
+      const section = getActiveSection();
+      return section.indicators.find(indicator => indicator.key === activeIndicatorKey);
+    }
+
+    function renderSectionTabs() {
+      sectionTabsEl.innerHTML = '';
+      sections.forEach(section => {
+        const btn = document.createElement('button');
+        btn.className = `tab${section.key === activeSectionKey ? ' is-active' : ''}`;
+        btn.type = 'button';
+        btn.textContent = section.label;
+        btn.addEventListener('click', () => {
+          activeSectionKey = section.key;
+          activeIndicatorKey = section.indicators[0].key;
+          renderAll();
+        });
+        sectionTabsEl.appendChild(btn);
+      });
+    }
+
+    function renderIndicatorChips() {
+      const section = getActiveSection();
+      indicatorChipsEl.innerHTML = '';
+      section.indicators.forEach(indicator => {
+        const btn = document.createElement('button');
+        btn.className = `chip${indicator.key === activeIndicatorKey ? ' is-active' : ''}`;
+        btn.type = 'button';
+        btn.textContent = indicator.label;
+        btn.addEventListener('click', () => {
+          activeIndicatorKey = indicator.key;
+          renderAll();
+        });
+        indicatorChipsEl.appendChild(btn);
+      });
+    }
+
+    function setPanelSubtitle(el, text) {
+      const hasText = Boolean(text && text.trim());
+      el.textContent = hasText ? text : '';
+      el.style.display = hasText ? 'block' : 'none';
+    }
+
+    function renderSummaryCards(indicator) {
+      const items = [
+        { label: 'Доступно', value: indicator.availability.available, color: colors.available },
+        { label: 'Частично доступно', value: indicator.availability.partial, color: colors.partial },
+        { label: 'Недоступно', value: indicator.availability.notAvailable, color: colors.notAvailable },
+        { label: 'Объект не работает', value: indicator.availability.notOperational, color: colors.notOperational }
+      ];
+
+      if (indicator.availability.extra > 0) {
+        items.splice(3, 0, { label: 'Не предусмотрено', value: indicator.availability.extra, color: colors.extra });
+      }
+
+      summaryEl.innerHTML = '';
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'summary-card';
+        card.innerHTML = `
+          <div class="summary-label"><span class="dot" style="background:${item.color}"></span>${item.label}</div>
+          <div class="summary-value">${formatPct(item.value)}</div>
+        `;
+        summaryEl.appendChild(card);
+      });
+    }
+
+    const bgPlugin = {
+      id: 'customCanvasBackgroundColor',
+      beforeDraw(chart, args, options) {
+        const { ctx, canvas } = chart;
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.fillStyle = options.color || '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+    };
+
+    Chart.defaults.font.family = 'Montserrat';
+
+    const availabilityCtx = document.getElementById('availabilityChart');
+    const barrierCtx = document.getElementById('barrierChart');
+
+    const availabilityChart = new Chart(availabilityCtx, {
+      type: 'bar',
+      data: {
+        labels: [''],
+        datasets: [
+          { label: 'Доступно', data: [0], backgroundColor: colors.available, borderWidth: 0, borderRadius: 0, barPercentage: 0.74, categoryPercentage: 0.78 },
+          { label: 'Частично доступно', data: [0], backgroundColor: colors.partial, borderWidth: 0, borderRadius: 0, barPercentage: 0.74, categoryPercentage: 0.78 },
+          { label: 'Недоступно', data: [0], backgroundColor: colors.notAvailable, borderWidth: 0, borderRadius: 0, barPercentage: 0.74, categoryPercentage: 0.78 },
+          { label: 'Доп. сегмент', data: [0], backgroundColor: colors.extra, borderWidth: 0, borderRadius: 0, barPercentage: 0.74, categoryPercentage: 0.78 },
+          { label: 'Объект не работает', data: [0], backgroundColor: colors.notOperational, borderWidth: 0, borderRadius: 0, barPercentage: 0.74, categoryPercentage: 0.78 }
+        ]
+      },
+      plugins: [bgPlugin],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        animation: { duration: 350 },
+        layout: {
+          padding: {
+            top: 0,
+            right: 8,
+            bottom: 0,
+            left: 0
+          }
+        },
+        plugins: {
+          customCanvasBackgroundColor: { color: '#ffffff' },
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${context.raw}%`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            beginAtZero: true,
+            max: 100,
+            grid: {
+              color: '#dddddd',
+              drawBorder: false
+            },
+            ticks: {
+              color: '#777777',
+              padding: 8,
+              font: { size: 12, weight: '500' },
+              callback: (value) => `${value}%`
+            },
+            border: { display: false }
+          },
+          y: {
+            stacked: true,
+            grid: { display: false },
+            ticks: { display: false },
+            border: { display: false }
+          }
+        }
+      }
+    });
+
+  const barrierHoverValuePlugin = {
+    id: 'barrierHoverValuePlugin',
+    afterDatasetsDraw(chart) {
+      const active = chart.getActiveElements();
+      if (!active || !active.length) return;
+
+      const { ctx, chartArea } = chart;
+      const activeEl = active[0];
+      const element = chart.getDatasetMeta(activeEl.datasetIndex).data[activeEl.index];
+      const value = chart.data.datasets[activeEl.datasetIndex].data[activeEl.index];
+      const label = `${value}%`;
+
+      ctx.save();
+      ctx.font = '600 12px Montserrat';
+      ctx.textBaseline = 'middle';
+
+      const paddingX = 8;
+      const boxH = 24;
+      const textW = ctx.measureText(label).width;
+      const boxW = textW + paddingX * 2;
+
+      let x = element.x + 10;
+      let y = element.y - boxH / 2;
+
+      if (x + boxW > chartArea.right) {
+        x = chartArea.right - boxW - 2;
+      }
+
+      if (y < chartArea.top) y = chartArea.top + 2;
+      if (y + boxH > chartArea.bottom) y = chartArea.bottom - boxH - 2;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#111111';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.rect(x, y, boxW, boxH);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#111111';
+      ctx.fillText(label, x + paddingX, y + boxH / 2);
+
+      ctx.restore();
+    }
+  };
+
+    const barrierChart = new Chart(barrierCtx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Доля объектов, %',
+          data: [],
+          backgroundColor: [],
+          borderWidth: 0,
+          borderRadius: 0,
+          barPercentage: 0.82,
+          categoryPercentage: 0.82
+        }]
+      },
+      plugins: [bgPlugin, barrierHoverValuePlugin],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        animation: { duration: 350 },
+        interaction: {
+          mode: 'nearest',
+          intersect: true
+        },
+        onHover: (event, activeElements, chart) => {
+          chart.canvas.style.cursor = activeElements.length ? 'pointer' : 'default';
+        },
+        layout: {
+          padding: {
+            top: 0,
+            right: 10,
+            bottom: 0,
+            left: 18
+          }
+        },
+        plugins: {
+          customCanvasBackgroundColor: { color: '#ffffff' },
+          legend: { display: false },
+          tooltip: {
+            enabled: false,
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            suggestedMax: 80,
+            grid: {
+              color: '#efefef',
+              drawBorder: false
+            },
+            ticks: {
+              color: '#777777',
+              padding: 8,
+              font: { size: 12, weight: '500' },
+              callback: (value) => `${value}%`
+            },
+            border: { display: false }
+          },
+          y: {
+            afterFit(scale) {
+              scale.width = 145;
+            },
+            grid: { display: false },
+            ticks: {
+              color: '#333333',
+              padding: 4,
+              crossAlign: 'far',
+              font: { size: 12, weight: '600' }
+            },
+            border: { display: false }
+          }
+        }
+      }
+    });
+
+    function updateAvailabilityChart(indicator) {
+      availabilityChart.data.datasets[0].data = [indicator.availability.available];
+      availabilityChart.data.datasets[1].data = [indicator.availability.partial];
+      availabilityChart.data.datasets[2].data = [indicator.availability.notAvailable];
+      availabilityChart.data.datasets[3].data = [indicator.availability.extra];
+      availabilityChart.data.datasets[3].hidden = indicator.availability.extra <= 0;
+      availabilityChart.data.datasets[4].data = [indicator.availability.notOperational];
+      if (extraLegendItemEl) extraLegendItemEl.style.display = indicator.availability.extra > 0 ? 'inline-flex' : 'none';
+      availabilityChart.update();
+    }
+
+    function updateBarrierChart(indicator) {
+      const entries = barrierMeta
+        .map(meta => ({
+          label: meta.label,
+          value: indicator.barriers[meta.key] || 0,
+          color: meta.color
+        }))
+        .filter(entry => entry.value > 0)
+        .sort((a, b) => b.value - a.value);
+
+      barrierChart.data.labels = entries.map(entry => entry.label);
+      barrierChart.data.datasets[0].data = entries.map(entry => entry.value);
+      barrierChart.data.datasets[0].backgroundColor = entries.map(entry => entry.color);
+
+      const maxValue = Math.max(...entries.map(entry => entry.value), 10);
+      barrierChart.options.scales.x.max = Math.max(80, Math.ceil(maxValue / 10) * 10);
+      barrierChart.update();
+    }
+
+    function renderAll() {
+      const section = getActiveSection();
+      const indicator = getActiveIndicator();
+
+      renderSectionTabs();
+      renderIndicatorChips();
+
+      availabilityTitleEl.textContent = indicator.label;
+      setPanelSubtitle(availabilitySubtitleEl, indicator.description || '');
+      setPanelSubtitle(barrierSubtitleEl, '');
+      renderSummaryCards(indicator);
+      updateAvailabilityChart(indicator);
+      updateBarrierChart(indicator);
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
